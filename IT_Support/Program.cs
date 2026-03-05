@@ -1,130 +1,191 @@
 ﻿namespace IT_Support
 {
-    internal class Program
+    namespace TEST_PRÜFUNG
     {
-        static void Main(string[] args)
+        using System;
+        using System.Collections.Generic;
+
+        internal class Programm
         {
-            // RÄUME ERSTELLEN / HIER WERDEN OBJEKTE ERSTELLT
-            Raum flur = new Raum("Flur", "Ein langer, heller Flur.");
-            Raum buero = new Raum("Büro", "Dein Schreibtisch, voll mit Zetteln.");
-            Raum lager = new Raum("Lager", "Überall Kartons mit alten Tastaturen und Kabeln.");
-            Raum serverraum = new Raum("Serverraum", "Es ist laut,d ie LEDs blinken rot!");
-            Raum kantine = new Raum("Kantine", "Es riecht nach Essen und Kaffee.");
-            Raum chefBuero = new Raum("Chef-Büro", "Luxus Raum mit goldenem Namensschild.");
-            Raum werkstatt = new Raum("Werkstatt", "Hier liegt fast alles an Werkzeug.");
-
-            // VERBINDUNGEN ERSTELLEN
-            flur.Ausgaenge.Add("norden", buero);
-            flur.Ausgaenge.Add("osten", lager);
-            flur.Ausgaenge.Add("westen", serverraum);
-            flur.Ausgaenge.Add("süden", kantine);
-
-            buero.Ausgaenge.Add("süden", flur);
-            buero.Ausgaenge.Add("norden", chefBuero);
-
-            lager.Ausgaenge.Add("westen", flur);
-            lager.Ausgaenge.Add("norden", werkstatt);
-
-            serverraum.Ausgaenge.Add("osten", flur);
-            kantine.Ausgaenge.Add("norden", flur);
-            chefBuero.Ausgaenge.Add("süden", buero);
-            werkstatt.Ausgaenge.Add("süden", lager);
-
-            // GEGENSTÄNDE ERSTELLEN
-            Gegenstand tastatur = new Gegenstand("Goldene Tastatur", "Sehr wertvoll.");
-            Gegenstand kaffee = new Gegenstand("Kaffee", "Gibt Energie.");
-            Gegenstand kabel = new Gegenstand("LAN-Kabel", "Wichtig für den Server.");
-
-
-            // GEGENSTÄNDE IN RÄUME LEGEN
-            chefBuero.GegenstaendeImRaum.Add(tastatur);  // Hier wird die goldene Tastatur im Chef-Büro platziert, damit der Spieler sie später finden und verwenden kann.
-            kantine.GegenstaendeImRaum.Add(kaffee); // Hier wird der Kaffee in der Kantine platziert, damit der Spieler ihn später finden und verwenden kann.
-            lager.GegenstaendeImRaum.Add(kabel); // Hier wird das Kabel in den Lagerraum gelegt, damit der Spieler es später finden und verwenden kann.
-
-
-
-            //SPIEL STARTEN
-
-            bool spielLaeuft = true;              // Hier wird eine boolesche Variable erstellt, die den Status des Spiels verfolgt. Solange diese Variable auf true gesetzt ist, läuft das Spiel weiter.
-            Raum aktuellerRaum = flur;            // Hier wird der aktuelle Raum auf den Flur gesetzt, damit der Spieler dort startet und von dort aus die anderen Räume erkunden kann.
-            Spieler spieler = new Spieler("");    // Hier wird ein neues Spieler-Objekt erstellt, das den Spieler repräsentiert. Der Name des Spielers wird als leerer String übergeben, da er später im Spiel festgelegt werden kann.
-
-
-            Console.WriteLine("******************************************");
-            Console.WriteLine("Willkommen zum IT-Support-Simulator!");         
-            Console.WriteLine("******************************************");
-            Console.ReadLine();
-
-
-
-            // SPIEL-SCHLEIFE
-            while (spielLaeuft)
+            static void Main(string[] args)
             {
-                Console.WriteLine("\n-----------------------------------");  
-                Console.WriteLine($"Du bist hier: {aktuellerRaum.Name}");     // Hier wird der Name des aktuellen Raums angezeigt, damit der Spieler weiß, wo er sich befindet.
-                Console.WriteLine(aktuellerRaum.Beschreibung);   // Hier wird der Name und die Beschreibung des aktuellen Raums angezeigt, damit der Spieler weiß, wo er sich befindet und was ihn dort erwartet.
+                // 1. INITIALISIERUNG: Welt und Spieler erstellen
+                Raum aktuellerRaum = InitialisiereWelt();
+                Spieler spieler = new Spieler("IT-Admin");
+                bool spielLaeuft = true;
 
-
-                // Menü für die verfügbaren Gegenstände
-                if (spieler.Inventar.Count > 0)   // Hier wird überprüft, ob der Spieler Gegenstände im Inventar hat. Wenn ja, wird "Inventar: " ausgegeben, gefolgt von den Namen der Gegenstände im Inventar.
+                // 2. HAUPTSCHLEIFE (Game Loop)
+                while (spielLaeuft)
                 {
-                    Console.Write("Inventar: ");  // Hier wird überprüft, ob der Spieler Gegenstände im Inventar hat. Wenn ja, wird "Inventar: " ausgegeben, gefolgt von den Namen der Gegenstände im Inventar.
-                    foreach (var s in spieler.Inventar) Console.Write("[" + s.Name + "] ");  // Hier wird das Inventar des Spielers angezeigt, indem die Namen der Gegenstände im Inventar in eckigen Klammern aufgelistet werden. Wenn das Inventar leer ist, wird nichts angezeigt.
-                    Console.WriteLine();  
+                    // Interface mit Karte und Status zeichnen
+                    ZeichneInterface(aktuellerRaum, spieler);
+
+                    // Prüfung: Hat der Spieler noch Energie?
+                    if (spieler.Energie <= 0)
+                    {
+                        Console.WriteLine("\n💀 Deine Energie ist leer! Du brichst zusammen. GAME OVER.");
+                        break;
+                    }
+
+                    // Menü-Listen vorbereiten
+                    var wege = new List<string>(aktuellerRaum.Ausgaenge.Keys);
+                    var gegenstaende = aktuellerRaum.GegenstaendeImRaum;
+
+                    // Menü ausgeben
+                    ZeichneMenue(wege, gegenstaende);
+
+                    // Eingabe verarbeiten
+                    string eingabe = Console.ReadLine();
+                    spielLaeuft = VerarbeiteEingabe(eingabe, wege, gegenstaende, ref aktuellerRaum, spieler);
                 }
 
-                // Liste für das Menü der verfügbaren Ausgänge
-                var wege = new List<string>(aktuellerRaum.Ausgaenge.Keys);    // Hier werden die verfügbaren Ausgänge des aktuellen Raums in eine Liste umgewandelt, damit sie im Menü angezeigt werden können.
-                var ding = aktuellerRaum.GegenstaendeImRaum;   // Hier wird die Liste der Gegenstände im aktuellen Raum in eine Variable gespeichert, um sie später anzuzeigen.
+                Console.WriteLine("\nProgramm beendet. Bis bald!");
+            }
 
-                Console.WriteLine("wohin willst du?");   
 
-                // Menü für die verfügbaren Ausgänge
-                for (int i = 0; i < wege.Count; i++)  // Hier wird eine Schleife verwendet, um die verfügbaren Ausgänge des aktuellen Raums anzuzeigen. Für jeden Ausgang wird die Nummer, die Richtung und der Name des Zielraums angezeigt, damit der Spieler entscheiden kann, wohin er gehen möchte.
+            // 2. WELT INITIALISIEREN: Räume, Verbindungen und Gegenstände
+            static Raum InitialisiereWelt()
+            {
+                // Räume erstellen
+                Raum flur = new Raum("Flur", "Ein langer, heller Flur.");
+                Raum buero = new Raum("Büro", "Dein Schreibtisch, voll mit Zetteln.");
+                Raum lager = new Raum("Lager", "Überall Kartons mit alten Tastaturen und Kabeln.");
+                Raum serverraum = new Raum("Serverraum", "Es ist laut, die LEDs blinken rot!");
+                Raum kantine = new Raum("Kantine", "Es riecht nach Essen und Kaffee.");
+                Raum chefBuero = new Raum("Chef-Büro", "Luxus Raum mit goldenem Namensschild.");
+                Raum werkstatt = new Raum("Werkstatt", "Hier liegt fast alles an Werkzeug.");
+
+                // Wege verbinden
+                flur.Ausgaenge.Add("norden", buero);
+                flur.Ausgaenge.Add("osten", lager);
+                flur.Ausgaenge.Add("westen", serverraum);
+                flur.Ausgaenge.Add("süden", kantine);
+                buero.Ausgaenge.Add("süden", flur);
+                buero.Ausgaenge.Add("norden", chefBuero);
+                lager.Ausgaenge.Add("westen", flur);
+                lager.Ausgaenge.Add("norden", werkstatt);
+                serverraum.Ausgaenge.Add("osten", flur);
+                kantine.Ausgaenge.Add("norden", flur);
+                chefBuero.Ausgaenge.Add("süden", buero);
+                werkstatt.Ausgaenge.Add("süden", lager);
+
+                // Gegenstände verteilen
+                kantine.GegenstaendeImRaum.Add(new Gegenstand("Kaffee", "Füllt Energie wieder auf."));
+                lager.GegenstaendeImRaum.Add(new Gegenstand("LAN-Kabel", "Wichtig für den Server."));
+                chefBuero.GegenstaendeImRaum.Add(new Gegenstand("Schlüsselkarte", "Öffnet den Serverraum."));
+
+                return flur; // Startpunkt
+            }
+
+            static void ZeichneInterface(Raum raum, Spieler spieler)
+            {
+                Console.Clear();
+                Console.WriteLine("******************************************");
+                Console.WriteLine($" ORT: {raum.Name.ToUpper()}");
+                Console.WriteLine("******************************************");
+
+                // Hier wird die Karte gezeichnet
+                ZeichneKarte(raum.Name);
+
+                Console.WriteLine($"\n{raum.Beschreibung}"); // Nutzt Beschreibung aus der klasse
+                Console.WriteLine("-----------------------------------");
+
+                // Statusleiste
+                Console.Write($"Energie: {spieler.Energie}% | Inventar: ");
+                if (spieler.Inventar.Count == 0) Console.Write("leer");
+                foreach (var s in spieler.Inventar) Console.Write("[" + s.Name + "] ");
+                Console.WriteLine("\n-----------------------------------");
+            }
+
+            static void ZeichneKarte(string raumName)
+            {
+                // ASCII-Design (ähnlich der vorlage)
+                if (raumName == "Flur")
                 {
-                    Raum ziel = aktuellerRaum.Ausgaenge[wege[i]];   // Hier wird der Zielraum für den aktuellen Ausgang aus dem Dictionary der Ausgänge des aktuellen Raums abgerufen.
-                    Console.WriteLine($"{i + 1}. {wege[i]} -> {ziel.Name}");   // Hier wird die Nummer, die Richtung und der Name des Zielraums für jeden verfügbaren Ausgang angezeigt.
+                    Console.WriteLine("      |---||xxx|");
+                    Console.WriteLine("      |    O    |"); // 'O' ist die spielerposition
+                    Console.WriteLine("      |---||---|");
+                }
+                else if (raumName == "Büro")
+                {
+                    Console.WriteLine("      |---|| O |");
+                    Console.WriteLine("      |         |");
+                    Console.WriteLine("      |---||---|");
+                }
+                else
+                {
+                    Console.WriteLine("      [ Karte für " + raumName + " folgt ]");
+                }
+            }
+
+            static void ZeichneMenue(List<string> wege, List<Gegenstand> gegenstaende)
+            {
+                Console.WriteLine("\nWAS MÖCHTEST DU TUN?");
+
+                // Optionen für Wege
+                for (int i = 0; i < wege.Count; i++)
+                {
+                    Console.WriteLine($"{i + 1}: Gehe nach {wege[i].ToUpper()}");
                 }
 
-                // Menü: Aufheben von Gegenständen im Raum
-
-                for (int i = 0; i < ding.Count; i++)  // Hier wird eine Schleife verwendet, um die Gegenstände im aktuellen Raum anzuzeigen. Für jeden Gegenstand wird die Nummer, der Name und die Beschreibung angezeigt, damit der Spieler entscheiden kann, ob er einen Gegenstand aufheben möchte.
+                // Optionen für Gegenstände
+                for (int i = 0; i < gegenstaende.Count; i++)
                 {
-                    Console.WriteLine($"{i + 1 + wege.Count}. [Gegenstand] {ding[i].Name} - {ding[i].Beschreibung}");   // Hier wird die Nummer, der Name und die Beschreibung jedes Gegenstands im aktuellen Raum angezeigt, damit der Spieler entscheiden kann, ob er einen Gegenstand aufheben möchte.
+                    Console.WriteLine($"{wege.Count + i + 1}: {gegenstaende[i].Name} aufheben");
                 }
-                Console.WriteLine("0: Beenden");  // Hier wird die Option "0: Beenden" angezeigt, damit der Spieler das Spiel beenden kann, wenn er dies wünscht.
-                Console.WriteLine("deine Wahl: ");  // Hier wird "deine Wahl: " ausgegeben, um den Spieler aufzufordern, eine Auswahl zu treffen, entweder einen Ausgang zu wählen, einen Gegenstand aufzuheben oder das Spiel zu beenden.
-                string eingabe = Console.ReadLine();   // Hier wird die Eingabe des Spielers gelesen, damit sie später verarbeitet werden kann, um die gewünschte Aktion auszuführen.
 
+                Console.WriteLine("0: Beenden");
+                Console.Write("\nDeine Wahl: ");
+            }
 
-                if (int.TryParse(eingabe, out int wahl))  // Hier wird überprüft, ob die Eingabe des Spielers eine gültige Zahl ist. Wenn ja, wird die Zahl in der Variable "wahl" gespeichert, damit sie später verwendet werden kann, um die gewünschte Aktion auszuführen.
+            static bool VerarbeiteEingabe(string eingabe, List<string> wege, List<Gegenstand> ding, ref Raum aktuellerRaum, Spieler spieler)
+            {
+                if (int.TryParse(eingabe, out int wahl))
                 {
-                    if (wahl == 0) spielLaeuft = false;   // Hier wird überprüft, ob die Wahl des Spielers "0" ist. Wenn ja, wird die Variable "spielLaeuft" auf false gesetzt, um die Spielschleife zu beenden und das Spiel zu verlassen.
+                    if (wahl == 0) return false;
 
                     // Logik: Gehen
-                    else if (wahl > 0 && wahl <= wege.Count)   // Hier wird überprüft, ob die Wahl des Spielers eine gültige Zahl ist, die einem der verfügbaren Ausgänge entspricht. Wenn ja, wird der aktuelle Raum auf den Zielraum des gewählten Ausgangs gesetzt, damit der Spieler dorthin gehen kann.
+                    if (wahl > 0 && wahl <= wege.Count)
                     {
-                        aktuellerRaum = aktuellerRaum.Ausgaenge[wege[wahl - 1]];  // Hier wird der aktuelle Raum auf den Zielraum des gewählten Ausgangs gesetzt, damit der Spieler dorthin gehen kann. Die Wahl des Spielers wird um 1 reduziert, um den Index der Liste der verfügbaren Ausgänge zu erhalten, da die Anzeige der Ausgänge bei 1 beginnt, aber die Indizes in der Liste bei 0 beginnen.
-                    }
+                        Raum ziel = aktuellerRaum.Ausgaenge[wege[wahl - 1]];
 
+                        // ZUGANGSCHECK: Serverraum
+                        if (ziel.Name == "Serverraum" && !spieler.HatGegenstand("Schlüsselkarte"))
+                        {
+                            Console.WriteLine("\n❌ ZUGRIFF VERWEIGERT! Du brauchst die Schlüsselkarte vom Chef.");
+                            Console.WriteLine("Drücke eine Taste...");
+                            Console.ReadKey();
+                        }
+                        else
+                        {
+                            aktuellerRaum = ziel;
+                            spieler.Energie -= 10; // Jeder Schritt kostet Kraft
+                        }
+                    }
                     // Logik: Aufheben
-                    else if (wahl > wege.Count && wahl <= wege.Count + ding.Count)   // Hier wird überprüft, ob die Wahl des Spielers eine gültige Zahl ist, die einem der verfügbaren Gegenstände im Raum entspricht. Wenn ja, wird der gewählte Gegenstand zum Inventar des Spielers hinzugefügt und aus dem Raum entfernt, damit der Spieler ihn aufheben kann.
+                    else if (wahl > wege.Count && wahl <= wege.Count + ding.Count)
                     {
-                        int index = wahl - wege.Count - 1;   // Hier wird der Index des gewählten Gegenstands berechnet, indem die Wahl des Spielers um die Anzahl der verfügbaren Ausgänge und um 1 reduziert wird, um den Index der Liste der Gegenstände im Raum zu erhalten, da die Anzeige der Gegenstände bei der Anzahl der Ausgänge + 1 beginnt, aber die Indizes in der Liste bei 0 beginnen.
-                        Gegenstand aufgehoben = ding[index];   // Hier wird der gewählte Gegenstand aus der Liste der Gegenstände im Raum abgerufen, damit er später zum Inventar des Spielers hinzugefügt und aus dem Raum entfernt werden kann.
+                        int index = wahl - wege.Count - 1;
+                        Gegenstand aufgehoben = ding[index];
 
-                        spieler.Inventar.Add(aufgehoben);   // Hier wird der gewählte Gegenstand zum Inventar des Spielers hinzugefügt, damit der Spieler ihn aufheben und später verwenden kann.
+                        // Spezial Item Kaffee
+                        if (aufgehoben.Name == "Kaffee")
+                        {
+                            spieler.Energie = 100;
+                            Console.WriteLine("\n☕ Du trinkst den Kaffee. Sofortige Energie!");
+                        }
+                        else
+                        {
+                            spieler.Inventar.Add(aufgehoben);
+                        }
+
                         ding.RemoveAt(index);
-
-                        Console.WriteLine($"\n>>> Du hast {aufgehoben.Name} eingepackt.");  // Hier wird eine Nachricht ausgegeben, die bestätigt, dass der Spieler den gewählten Gegenstand erfolgreich aufheben konnte, indem der Name des Gegenstands in die Nachricht eingefügt wird.
+                        Console.WriteLine($"\n>>> {aufgehoben.Name} verarbeitet.");
+                        Console.ReadKey();
                     }
-                    else Console.WriteLine("\nFalsche Zahl!");
                 }
-                else Console.WriteLine("\nBitte nur Zahlen tippen!");
+                return true;
             }
-            Console.WriteLine("Programm beendet. Bis bald!");
-
         }
-        
     }
 }
