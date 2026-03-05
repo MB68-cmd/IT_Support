@@ -13,6 +13,8 @@
             Raum chefBuero = new Raum("Chef-Büro", "Luxus Raum mit goldenem Namensschild.");
             Raum werkstatt = new Raum("Werkstatt", "Hier liegt fast alles an Werkzeug.");
 
+            //test
+
 
             // VERBINDUNGEN ERSTELLEN
             //flur.Ausgaenge.Add("norden", buero);
