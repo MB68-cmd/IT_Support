@@ -18,7 +18,7 @@ namespace IT_Support
             // Hier wird die Karte gezeichnet
             ZeichneKarte(raum.Name);
 
-            Console.WriteLine($"\n{raum.Beschreibung}"); // Nutzt Beschreibung aus der klasse
+            Console.WriteLine($"\n{raum.Beschreibung}"); // Nutzt Beschreibung aus der Klasse
             Console.WriteLine("-----------------------------------");
 
             // Statusleiste
@@ -28,26 +28,69 @@ namespace IT_Support
             Console.WriteLine("\n-----------------------------------");
         }
 
-        static void ZeichneKarte(string raumName)
+
+        // ASCII-Design (wird je nach Raum angepasst)
+        public static void ZeichneKarte(string raumName)
         {
-            // ASCII-Design (ähnlich der vorlage)
-            if (raumName == "Flur")
+            string pFlur = " ", pBuero = " ", pLager = " ", pServer = " ", pKantine = " ", pChef = " ", pWerk = " ";
+
+            switch (raumName)
             {
-                Console.WriteLine("      |---||xxx|");
-                Console.WriteLine("      |    O    |"); // 'O' ist die spielerposition
-                Console.WriteLine("      |---||---|");
+                case "Flur": pFlur = "O"; break;
+                case "Büro": pBuero = "O"; break;
+                case "Lager": pLager = "O"; break;
+                case "Serverraum": pServer = "O"; break;
+                case "Kantine": pKantine = "O"; break;
+                case "Chef-Büro": pChef = "O"; break;
+                case "Werkstatt": pWerk = "O"; break;
             }
-            else if (raumName == "Büro")
+
+            Console.ForegroundColor = ConsoleColor.Green;
+
+            Console.WriteLine("              ┌─────────┐");
+            Console.Write("              │   "); ZeichneO(pChef); Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("     │  Chef-Büro");
+            Console.WriteLine("              └────┬────┘");
+            Console.WriteLine("                   │");
+
+            Console.WriteLine("              ┌─────────┐");
+            Console.Write("              │   "); ZeichneO(pBuero); Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("     │  Büro");
+            Console.WriteLine("              └────┬────┘");
+            Console.WriteLine("                   │");
+
+            Console.WriteLine("┌─────────┐   ┌─────────┐   ┌─────────┐");
+            Console.Write("│   "); ZeichneO(pServer); Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.Write("     │───│   "); ZeichneO(pFlur); Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.Write("     │───│   "); ZeichneO(pLager); Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("     │");
+            Console.WriteLine("│Serverraum│   │   Flur  │   │  Lager  │");
+            Console.WriteLine("└─────────┘   └────┬────┘   └────┬────┘");
+            Console.WriteLine("                   │             │");
+
+            Console.WriteLine("              ┌─────────┐   ┌─────────┐");
+            Console.Write("              │   "); ZeichneO(pKantine); Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.Write("     │   │   "); ZeichneO(pWerk); Console.ForegroundColor = ConsoleColor.DarkGreen;
+            Console.WriteLine("     │");
+            Console.WriteLine("              │ Kantine │   │Werkstatt│");
+            Console.WriteLine("              └─────────┘   └─────────┘");
+
+            Console.ResetColor();
+        }
+
+        public static void ZeichneO(string p)
+        {
+            if (p == "O")
             {
-                Console.WriteLine("      |---|| O |");
-                Console.WriteLine("      |         |");
-                Console.WriteLine("      |---||---|");
+                Console.ForegroundColor = ConsoleColor.Cyan; // Blaues Männchen leuchtet im Darkmode super
+                Console.Write("O");
             }
             else
             {
-                Console.WriteLine("      [ Karte für " + raumName + " folgt ]");
+                Console.Write(" ");
             }
         }
+
 
         public static void ZeichneMenue(List<string> wege, List<Gegenstand> gegenstaende)
         {

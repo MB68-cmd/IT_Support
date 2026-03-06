@@ -1,6 +1,6 @@
 ﻿namespace IT_Support
 {
-    internal class Programm
+    internal class Programm   
     {
         static void Main(string[] args)
         {
@@ -18,7 +18,7 @@
                 // Prüfung: Hat der Spieler noch Energie?
                 if (spieler.Energie <= 0)
                 {
-                    Console.WriteLine("\n💀 Deine Energie ist leer! Du brichst zusammen. GAME OVER.");
+                    Console.WriteLine("\n Deine Energie ist leer! Du brichst zusammen. GAME OVER.");
                     break;
                 }
 
@@ -36,10 +36,7 @@
 
             Console.WriteLine("\nProgramm beendet. Bis bald!");
         }
-
-
-        // 2. WELT INITIALISIEREN: Räume, Verbindungen und Gegenstände
-        static Raum InitialisiereWelt()
+        public static Raum InitialisiereWelt()
         {
             // Räume erstellen
             Raum flur = new Raum("Flur", "Ein langer, heller Flur.");
@@ -71,9 +68,6 @@
 
             return flur; // Startpunkt
         }
-
-        
-
         static bool VerarbeiteEingabe(string eingabe, List<string> wege, List<Gegenstand> ding, ref Raum aktuellerRaum, Spieler spieler)
         {
             if (int.TryParse(eingabe, out int wahl))
@@ -88,7 +82,7 @@
                     // ZUGANGSCHECK: Serverraum
                     if (ziel.Name == "Serverraum" && !spieler.HatGegenstand("Schlüsselkarte"))
                     {
-                        Console.WriteLine("\n ZUGRIFF VERWEIGERT! Du brauchst die Schlüsselkarte vom Chef.");
+                        Console.WriteLine("\n XXX  ZUGRIFF VERWEIGERT! Du brauchst die Schlüsselkarte vom Chef.");
                         Console.WriteLine("Drücke eine Taste...");
                         Console.ReadKey();
                     }
