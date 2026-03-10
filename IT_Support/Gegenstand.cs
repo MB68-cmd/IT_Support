@@ -1,34 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace IT_Support
+﻿namespace IT_Support
 {
+
     internal class Gegenstand
     {
-        // Name 
-        public string Name { get; set; }
-        // Beschreibung 
-        public string Beschreibung { get; set; }
+        
+        public string Name { get; set; }    // Neme
+        
+        public string Beschreibung { get; set; } // 
 
-        // Erstellt einen neuen Gegenstand
+        /// <summary>
+        /// Erstellt einen neuen Gegenstand
+        /// </summary>
+        /// <param name="name"
+        /// <param name="beschreibung"
         public Gegenstand(string name, string beschreibung)
         {
             Name = name;
             Beschreibung = beschreibung;
         }
-        // Logik für die Benutzung von Gegenständen
-        public static void BenutzeGegenstand(Gegenstand item, Spieler spieler, ref Raum aktuellerRaum)
+
+        /// <summary>
+        /// Benutzt einen Gegenstand, abhängig von seiner Art und dem aktuellen Raum
+        /// </summary>
+        /// <param name="item"></param>
+        /// <param name="spieler"></param>
+        /// <param name="aktuellerRaum"></param>
+        public static void BenutzeGegenstand(Gegenstand item, Spieler spieler, ref Raum aktuellerRaum)             // Benötigt wird der Gegenstand, der Spieler, und der aktuelle Raum (ref, da er sich ändern könnte)
         {
             Console.WriteLine($"\nDu benutzt: {item.Name}...");
             
-            switch (item.Name)
+            switch (item.Name)              // Je nach Gegenstand, wird eine andere Aktion ausgeführt. Es könnte sein, dass der Gegenstand in diesem Raum nicht benutzt werden kann, oder dass er automatisch beim Betreten des Raums geprüft 
             {
-                
-                case "LAN-Kabel":
-                    if (aktuellerRaum.Name == "Serverraum")
+
+                case "LAN-Kabel":          // Das LAN-Kabel kann nur im Serverraum benutzt werden, um die Reparatur abzuschließen
+                    if (aktuellerRaum.Name == "Serverraum")   
                     {
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine("\n [REPARATUR] Du schließt das LAN-Kabel an den Haupt-Switch an.");
@@ -46,15 +51,16 @@ namespace IT_Support
                     }
                     else
                     {
-                        Console.WriteLine("Hier kannst du das Kabel nicht gebrauchen.");
+                        Console.WriteLine("Hier kannst du das Kabel nicht gebrauchen.");   
                     }
                     break;
 
+                // Die Schlüsselkarte wird automatisch beim Betreten des Serverraums geprüft, um Zugang zu gewähren. Sie muss nicht manuell benutzt werden.
                 case "Schlüsselkarte":
-                    Console.WriteLine("Die Karte wird automatisch beim Betreten des Serverraums geprüft.");
+                    Console.WriteLine("Die Karte wird automatisch beim Betreten des Serverraums geprüft.");  
                     break;
 
-                    
+
             }
             Console.ReadKey();
         }

@@ -1,38 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace IT_Support
+﻿namespace IT_Support
 {
+    /// <summary>
+    /// Die UI-Klasse ist für die Darstellung des Spiels zuständig: Sie zeichnet das Hauptinterface, die Karte und das Menü mit den möglichen Befehlen
+    /// </summary>
     internal class UI
     {
-        // Zeichnet das Hauptinterface mit Raumname, Beschreibung, Karte, Inventar und Aufgaben
-        public static void ZeichneInterface(Raum raum, Spieler spieler)
+        /// <summary>
+        /// Zeichnet das Hauptinterface mit Raumname, Beschreibung, Karte, Inventar und Aufgaben
+        /// </summary>
+        public static void ZeichneInterface(Raum raum, Spieler spieler)                 
         {
             Console.Clear();
             Console.WriteLine("******************************************");
-            Console.WriteLine($" ORT: {raum.Name.ToUpper()}");
+            Console.WriteLine($" ORT: {raum.Name.ToUpper()}");                          // Zeigt den Namen des aktuellen Raums an
             Console.WriteLine("******************************************");
 
-            
-            Console.WriteLine($"\n{raum.Beschreibung}"); // Nutzt Beschreibung aus der Klasse
-            Console.WriteLine("-----------------------------------");
 
-            ZeichneKarte(raum.Name);  // Zeichnet die Karte mit Spielerposition
+            Console.WriteLine($"{raum.Beschreibung}\n\n");                                // Nutzt Beschreibung aus der Klasse
+
+            ZeichneKarte(raum.Name);                                                    // Zeichnet die Karte mit Spielerposition
 
 
             // Inventar und Energieanzeige
-            if (spieler.Energie < 30) Console.ForegroundColor = ConsoleColor.Red;
-            else Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.Write("Inventar: ");
-            if (spieler.Inventar.Count == 0) Console.Write("leer");
-            foreach (var s in spieler.Inventar) Console.Write("[" + s.Name + "] ");
-            Console.WriteLine("\n-----------------------------------");
+
+            if (spieler.Energie < 30) Console.ForegroundColor = ConsoleColor.Red;         // Warnung bei niedrigem Energielevel
+            else Console.ForegroundColor = ConsoleColor.DarkYellow; Console.ResetColor();  // Normalfarbe bei ausreichender Energie
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("\nInventar: ");
+            if (spieler.Inventar.Count == 0) Console.Write("leer");                     // Zeigt den Inhalt des Inventars an oder "leer", wenn nichts drin ist
+            foreach (var s in spieler.Inventar) Console.Write("[" + s.Name + "] ");     // Listet die Gegenstände im Inventar auf
+            Console.WriteLine("\n-----------------------------------"); 
+            Console.ResetColor();
+
             // Aufgabenliste mit Status
             Console.WriteLine("\n--- AKTUELLE AUFGABEN ---");
-            
+
             if (!spieler.HatGegenstand("Schlüsselkarte"))
                 Console.WriteLine(" [ ] Hol die Schlüsselkarte vom Chef.");
             else
@@ -48,17 +51,20 @@ namespace IT_Support
             else
                 Console.WriteLine(" [ ] Repariere den Server im Serverraum.");
 
-            Console.Write($"Energie: {spieler.Energie}%");
+            Console.WriteLine($"\nEnergie: {spieler.Energie}%\n");
             Console.ResetColor();
         }
 
 
-        // Zeichnet die Karte mit einem "O" an der Position des Spielers
-        public static void ZeichneKarte(string raumName)
+        /// <summary>
+        /// Zeichnet die Karte mit einem "O" an der Position des Spielers
+        /// </summary>
+        
+        public static void ZeichneKarte(string raumName)     // Nimmt den Namen des aktuellen Raums als Parameter, um die Position des Spielers zu markieren
         {
             string pFlur = " ", pBuero = " ", pLager = " ", pServer = " ", pKantine = " ", pChef = " ", pWerk = " ";
 
-            switch (raumName)
+            switch (raumName)  // Je nach aktuellem Raum wird das "O" an der entsprechenden Stelle gesetzt
             {
                 case "Flur": pFlur = "O"; break;
                 case "Büro": pBuero = "O"; break;
@@ -68,6 +74,9 @@ namespace IT_Support
                 case "Chef-Büro": pChef = "O"; break;
                 case "Werkstatt": pWerk = "O"; break;
             }
+
+
+            // Karte zeichnen mit ASCII-Art, die Räume sind in einer festen Anordnung dargestellt, damit der Spieler sich orientieren kann
 
             Console.ForegroundColor = ConsoleColor.Green;
 
@@ -102,41 +111,50 @@ namespace IT_Support
             Console.ResetColor();
         }
 
-        public static void ZeichneO(string p)
+
+        /// <summary>
+        /// Hilfsmethode zum Zeichnen eines "O" an der Position des Spielers auf der Karte
+        /// </summary>
+        public static void ZeichneO(string p)              // Nimmt einen String als Parameter, der entweder "O" oder " " sein kann, um die Position des Spielers zu markieren
         {
-            if (p == "O")
+            if (p == "O")                                 // Wenn der Spieler sich in diesem Raum befindet, wird ein "O" gezeichnet
             {
-                Console.ForegroundColor = ConsoleColor.Cyan; 
+                Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.Write("O");
             }
             else
             {
-                Console.Write(" ");
+                Console.Write(" ");                       // Ansonsten bleibt die Stelle leer
             }
-        }
+        }          
 
-        // Das Menü zeigt die möglichen Befehle an, basierend auf den Ausgängen und Gegenständen im Raum sowie dem Inventar des Spielers
-        public static void ZeichneMenue(Dictionary<string, Raum> ausgaenge, List<Gegenstand> gegenstaende, Spieler spieler)
+        /// <summary>
+        /// Das Menü zeigt die möglichen Befehle an, basierend auf den Ausgängen und Gegenständen im Raum sowie dem Inventar des Spielers
+        /// </summary>
+        public static void ZeichneMenue(Dictionary<string, Raum> ausgaenge, List<Gegenstand> gegenstaende, Spieler spieler)   // Nimmt die verfügbaren Ausgänge, Gegenstände im Raum und den Spieler als Parameter, um die möglichen Befehle anzuzeigen
         {
+            Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("\n--- DEINE BEFEHLE ---");
 
-            foreach (var richtung in ausgaenge.Keys)
+            foreach (var richtung in ausgaenge.Keys)                        // Zeigt die verfügbaren Richtungen an, in die der Spieler gehen kann
             {
                 Console.WriteLine($" > gehe {richtung.ToUpper()}");
             }
 
-            foreach (var item in gegenstaende)
+            foreach (var item in gegenstaende)                              // Zeigt die Gegenstände im Raum an, die der Spieler aufnehmen kann
             {
                 Console.WriteLine($" > nimm {item.Name.ToUpper()}");
             }
 
-            foreach (var item in spieler.Inventar)
+            foreach (var item in spieler.Inventar)                          // Zeigt die Gegenstände im Inventar an, die der Spieler benutzen kann
             {
-                Console.WriteLine($" > benutze {item.Name.ToUpper()}");
+                Console.WriteLine($" > benutze {item.Name.ToUpper()}"); 
             }
 
             Console.WriteLine(" > ende");
-            Console.Write("\n Was willst du tun? ");
+            Console.ResetColor();
+
+            Console.WriteLine("\n Was willst du tun? ");
 
         }
     }

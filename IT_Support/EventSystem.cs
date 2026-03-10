@@ -5,13 +5,16 @@
         // Ein Zufallsgenerator, damit nicht immer das Gleiche passiert
         private static Random rnd = new Random();
 
+        /// <summary>
+        /// Diese Methode wird aufgerufen, wenn der Spieler einen Raum betritt. Es gibt eine Chance, dass ein zufälliges Event passiert.
+        /// </summary>
         internal static void CheckForRandomEvent(Spieler spieler, Raum raum)
         {
-            // Es gibt eine 20% Chance, dass ein zufälliges Event passiert
+            // Es gibt eine 33,33% Chance, dass ein zufälliges Event passiert
             int zahl = rnd.Next(1, 11);
 
-            // Bei einer Zahl von 1 oder 2 passiert ein zufälliges Event
-            if (zahl <= 2)
+            // Bei einer Zahl von 1 bis 3 passiert ein zufälliges Event
+            if (zahl <= 3)
             {
                 Console.ForegroundColor = ConsoleColor.Cyan;
                 Console.WriteLine("\n--- ZUFALLSEVENT ---");

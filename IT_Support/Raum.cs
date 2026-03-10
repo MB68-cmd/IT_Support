@@ -1,29 +1,26 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace IT_Support
+﻿namespace IT_Support
 {
     internal class Raum        // Der Bauplan für die Räume, hier werden die Eigenschaften und Methoden definiert, die alle Räume haben
     {
-        public string Name { get; set; }
-        public string Beschreibung { get; set; }
-        public Dictionary<string, Raum> Ausgaenge { get; set; }
-        public List<Gegenstand> GegenstaendeImRaum { get; set; }
-        
-        public string BenoetigterGegenstand { get; set; }
-        public Raum(string name, string beschreibung, string benoetigterGegenstand = null)
+        public string Name { get; set; }  // Name des Raums, wird bei der Erstellung eines Raums festgelegt
+        public string Beschreibung { get; set; }  // Beschreibung des Raums, wird bei der Erstellung eines Raums festgelegt
+        public Dictionary<string, Raum> Ausgaenge { get; set; }  // Ein Dictionary, das die möglichen Ausgänge aus diesem Raum definiert, mit der Richtung als Schlüssel und dem Zielraum als Wert
+        public List<Gegenstand> GegenstaendeImRaum { get; set; }  // Eine Liste der Gegenstände, die sich in diesem Raum befinden, wird bei der Erstellung eines Raums als leere Liste initialisiert und später mit Gegenständen gefüllt
+
+        public string BenoetigterGegenstand { get; set; }  // Optionaler Gegenstand, der benötigt wird, um diesen Raum zu betreten, z.B. eine Schlüsselkarte für den Serverraum. Wenn null, ist kein Gegenstand erforderlich.
+        public Raum(string name, string beschreibung, string benoetigterGegenstand = null)  // Konstruktor, der den Namen, die Beschreibung und den benötigten Gegenstand für den Raum festlegt. Die Ausgänge und Gegenstände im Raum werden als leere Strukturen initialisiert.
         {
-            Name = name;
-            Beschreibung = beschreibung;
-            Ausgaenge = new Dictionary<string, Raum>();
-            GegenstaendeImRaum = new List<Gegenstand>();
-            BenoetigterGegenstand = benoetigterGegenstand;  
+            Name = name;  // Setzt den Namen des Raums auf den übergebenen Wert
+            Beschreibung = beschreibung;  // Setzt die Beschreibung des Raums auf den übergebenen Wert
+            Ausgaenge = new Dictionary<string, Raum>();  // Initialisiert die Ausgänge als leeres Dictionary
+            GegenstaendeImRaum = new List<Gegenstand>();  // Initialisiert die Liste der Gegenstände im Raum als leere Liste
+            BenoetigterGegenstand = benoetigterGegenstand;  // Setzt den benötigten Gegenstand für den Raum auf den übergebenen Wert, oder null, wenn keiner benötigt wird
         }
 
-        public object HoleAktion(int wahl)
+        /// <summary>
+        /// Diese Methode nimmt die Wahl des Spielers (eine Zahl) und gibt entweder den Zielraum zurück, wenn die Wahl einem Ausgang entspricht, oder den Gegenstand, wenn die Wahl einem Gegenstand im Raum entspricht. Wenn die Wahl ungültig ist, wird null zurückgegeben.
+        /// </summary>
+        public object HoleAktion(int wahl)   
         {
             // Ist es ein Ausgang?
             if (wahl > 0 && wahl <= Ausgaenge.Count)
