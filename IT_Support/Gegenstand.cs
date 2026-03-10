@@ -8,14 +8,55 @@ namespace IT_Support
 {
     internal class Gegenstand
     {
-        public string Name { get; set; }  // Name des Gegenstands
+        // Name 
+        public string Name { get; set; }
+        // Beschreibung 
+        public string Beschreibung { get; set; }
 
-        public string Beschreibung { get; set; }  // Beschreibung des Gegenstands
-        public Gegenstand(string name, string beschreibung)  // Konstruktor  // Bauplan: Erstellt einen neuen Gegenstand
+        // Erstellt einen neuen Gegenstand
+        public Gegenstand(string name, string beschreibung)
         {
-            Name = name;                     // Setzt den Namen des Gegenstands auf den übergebenen Wert
-            Beschreibung = beschreibung;     // Setzt die Beschreibung des Gegenstands auf den übergebenen Wert
+            Name = name;
+            Beschreibung = beschreibung;
         }
+        // Logik für die Benutzung von Gegenständen
+        public static void BenutzeGegenstand(Gegenstand item, Spieler spieler, ref Raum aktuellerRaum)
+        {
+            Console.WriteLine($"\nDu benutzt: {item.Name}...");
+            
+            switch (item.Name)
+            {
+                
+                case "LAN-Kabel":
+                    if (aktuellerRaum.Name == "Serverraum")
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.WriteLine("\n [REPARATUR] Du schließt das LAN-Kabel an den Haupt-Switch an.");
+                        Console.WriteLine(" Die LEDs springen von Orange auf Grün. Das Netz lebt!");
+                        Console.Clear();
+                        Console.WriteLine("========================================");
+                        Console.WriteLine("   S I E G ! ! !");
+                        Console.WriteLine("========================================");
+                        Console.WriteLine("Du hast das Kabel eingesteckt.");
+                        Console.WriteLine("Die Server leuchten grün. Das Internet läuft!");
+                        Console.WriteLine("\nDrücke eine Taste, um in den Feierabend zu gehen...");
+                        Console.ReadKey();
 
+                        Environment.Exit(0); // Beendet das Spiel sofort
+                    }
+                    else
+                    {
+                        Console.WriteLine("Hier kannst du das Kabel nicht gebrauchen.");
+                    }
+                    break;
+
+                case "Schlüsselkarte":
+                    Console.WriteLine("Die Karte wird automatisch beim Betreten des Serverraums geprüft.");
+                    break;
+
+                    
+            }
+            Console.ReadKey();
+        }
     }
 }

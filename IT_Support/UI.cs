@@ -8,6 +8,7 @@ namespace IT_Support
 {
     internal class UI
     {
+        // Zeichnet das Hauptinterface mit Raumname, Beschreibung, Karte, Inventar und Aufgaben
         public static void ZeichneInterface(Raum raum, Spieler spieler)
         {
             Console.Clear();
@@ -15,21 +16,44 @@ namespace IT_Support
             Console.WriteLine($" ORT: {raum.Name.ToUpper()}");
             Console.WriteLine("******************************************");
 
-            // Hier wird die Karte gezeichnet
-            ZeichneKarte(raum.Name);
-
+            
             Console.WriteLine($"\n{raum.Beschreibung}"); // Nutzt Beschreibung aus der Klasse
             Console.WriteLine("-----------------------------------");
 
-            // Statusleiste
-            Console.Write($"Energie: {spieler.Energie}% | Inventar: ");
+            ZeichneKarte(raum.Name);  // Zeichnet die Karte mit Spielerposition
+
+
+            // Inventar und Energieanzeige
+            if (spieler.Energie < 30) Console.ForegroundColor = ConsoleColor.Red;
+            else Console.ForegroundColor = ConsoleColor.DarkYellow;
+            Console.Write("Inventar: ");
             if (spieler.Inventar.Count == 0) Console.Write("leer");
             foreach (var s in spieler.Inventar) Console.Write("[" + s.Name + "] ");
             Console.WriteLine("\n-----------------------------------");
+            // Aufgabenliste mit Status
+            Console.WriteLine("\n--- AKTUELLE AUFGABEN ---");
+            
+            if (!spieler.HatGegenstand("Schlüsselkarte"))
+                Console.WriteLine(" [ ] Hol die Schlüsselkarte vom Chef.");
+            else
+                Console.WriteLine(" [X] Schlüsselkarte gefunden!");
+
+            if (!spieler.HatGegenstand("LAN-Kabel"))
+                Console.WriteLine(" [ ] Finde ein Ersatz-Kabel im Lager.");
+            else
+                Console.WriteLine(" [X] LAN-Kabel eingepackt!");
+
+            if (spieler.ErledigteAufgaben.Contains("ServerRepariert"))
+                Console.WriteLine(" [X] Internet wiederhergestellt!");
+            else
+                Console.WriteLine(" [ ] Repariere den Server im Serverraum.");
+
+            Console.Write($"Energie: {spieler.Energie}%");
+            Console.ResetColor();
         }
 
 
-        // ASCII-Design (wird je nach Raum angepasst)
+        // Zeichnet die Karte mit einem "O" an der Position des Spielers
         public static void ZeichneKarte(string raumName)
         {
             string pFlur = " ", pBuero = " ", pLager = " ", pServer = " ", pKantine = " ", pChef = " ", pWerk = " ";
@@ -82,7 +106,7 @@ namespace IT_Support
         {
             if (p == "O")
             {
-                Console.ForegroundColor = ConsoleColor.Cyan; // Blaues Männchen leuchtet im Darkmode super
+                Console.ForegroundColor = ConsoleColor.Cyan; 
                 Console.Write("O");
             }
             else
@@ -91,25 +115,29 @@ namespace IT_Support
             }
         }
 
-
-        public static void ZeichneMenue(List<string> wege, List<Gegenstand> gegenstaende)
+        // Das Menü zeigt die möglichen Befehle an, basierend auf den Ausgängen und Gegenständen im Raum sowie dem Inventar des Spielers
+        public static void ZeichneMenue(Dictionary<string, Raum> ausgaenge, List<Gegenstand> gegenstaende, Spieler spieler)
         {
-            Console.WriteLine("\nWAS MÖCHTEST DU TUN?");
+            Console.WriteLine("\n--- DEINE BEFEHLE ---");
 
-            // Optionen für Wege
-            for (int i = 0; i < wege.Count; i++)
+            foreach (var richtung in ausgaenge.Keys)
             {
-                Console.WriteLine($"{i + 1}: Gehe nach {wege[i].ToUpper()}");
+                Console.WriteLine($" > gehe {richtung.ToUpper()}");
             }
 
-            // Optionen für Gegenstände
-            for (int i = 0; i < gegenstaende.Count; i++)
+            foreach (var item in gegenstaende)
             {
-                Console.WriteLine($"{wege.Count + i + 1}: {gegenstaende[i].Name} aufheben");
+                Console.WriteLine($" > nimm {item.Name.ToUpper()}");
             }
 
-            Console.WriteLine("0: Beenden");
-            Console.Write("\nDeine Wahl: ");
+            foreach (var item in spieler.Inventar)
+            {
+                Console.WriteLine($" > benutze {item.Name.ToUpper()}");
+            }
+
+            Console.WriteLine(" > ende");
+            Console.Write("\n Was willst du tun? ");
+
         }
     }
 }

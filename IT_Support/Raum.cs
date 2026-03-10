@@ -8,20 +8,44 @@ namespace IT_Support
 {
     internal class Raum        // Der Bauplan für die Räume, hier werden die Eigenschaften und Methoden definiert, die alle Räume haben
     {
-        public string Name { get; set; }    // Name des Raumes
-        public string Beschreibung { get; set; }  // Beschreibung des Raumes
-
-        public Dictionary<string, Raum> Ausgaenge { get; set; }  // Dictionary, um die Ausgänge zu anderen Räumen zu speichern, der Schlüssel ist die Richtung (z.B. "norden") und der Wert ist der
-
-        public List<Gegenstand> GegenstaendeImRaum { get; set; }  // Liste der Gegenstände, die sich im Raum befinden
-
-
-        public Raum(string name, string beschreibung)   // Konstruktor, um die Eigenschaften eines Raumes zu setzen, wenn er erstellt wird
+        public string Name { get; set; }
+        public string Beschreibung { get; set; }
+        public Dictionary<string, Raum> Ausgaenge { get; set; }
+        public List<Gegenstand> GegenstaendeImRaum { get; set; }
+        
+        public string BenoetigterGegenstand { get; set; }
+        public Raum(string name, string beschreibung, string benoetigterGegenstand = null)
         {
-            Name = name;  // Setzt den Namen des Raumes auf den übergebenen Wert
-            Beschreibung = beschreibung;  // Setzt die Beschreibung des Raumes
-            Ausgaenge = new Dictionary<string, Raum>();  // Initialisiert die Ausgänge als leeres Dictionary
-            GegenstaendeImRaum = new List<Gegenstand>(); // Initialisiert die Liste der Gegenstände im Raum als leere Liste
+            Name = name;
+            Beschreibung = beschreibung;
+            Ausgaenge = new Dictionary<string, Raum>();
+            GegenstaendeImRaum = new List<Gegenstand>();
+            BenoetigterGegenstand = benoetigterGegenstand;  
+        }
+
+        public object HoleAktion(int wahl)
+        {
+            // Ist es ein Ausgang?
+            if (wahl > 0 && wahl <= Ausgaenge.Count)
+            {
+                return Ausgaenge.ElementAt(wahl - 1).Value; // Gibt den Zielraum zurück
+            }
+
+            // Ist es ein Gegenstand?
+            int gegenstandsIndex = wahl - Ausgaenge.Count - 1;
+            if (gegenstandsIndex >= 0 && gegenstandsIndex < GegenstaendeImRaum.Count)
+            {
+                return GegenstaendeImRaum[gegenstandsIndex]; // Gibt den Gegenstand zurück
+            }
+
+            return null; // Ungültige Wahl
         }
     }
 }
+
+
+
+
+
+
+
